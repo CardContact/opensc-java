@@ -1,0 +1,13 @@
+<ivy-module version="2.0">
+    <info organisation="org.openscdp" module="opensc-java"/>
+    <publications>
+        <artifact name="opensc-java" type="jar"/>
+        <artifact name="opensc-PKCS11-x86" type="native" ext="dll"/>
+        <artifact name="opensc-PKCS11-amd64" type="native" ext="dll"/>
+        <artifact name="libopensc-PKCS11-i386" type="native" ext="so"/>
+        <artifact name="libopensc-PKCS11-amd64" type="native" ext="so"/>
+    </publications>
+    <dependencies>
+        <dependency org="commons-logging" name="commons-logging-api" rev="1.1"/>
+    </dependencies>
+</ivy-module>
