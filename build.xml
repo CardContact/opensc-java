@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="pkcs11" basedir="." default="dist">
 
-	<property file="../jarsigner.cfg" />
+	<property file="../jcesigner.cfg" />
       
 	<property name="build" location="build"/>
 	<property name="publishresolver" value="local"/>
