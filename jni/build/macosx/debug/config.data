@@ -1,0 +1,7 @@
+#
+# Default makefile variable settings.
+#
+ac CFLAGS=-g -Wall
+ac CXXFLAGS=-g -Wall
+ac JNI_CFLAGS=-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/darwin
+ac LIBDYN=dylib

@@ -6,6 +6,7 @@
         <artifact name="opensc-PKCS11-amd64" type="native" ext="dll"/>
         <artifact name="libopensc-PKCS11-i386" type="native" ext="so"/>
         <artifact name="libopensc-PKCS11-amd64" type="native" ext="so"/>
+        <artifact name="libopensc-PKCS11-x86_64" type="native" ext="dylib"/>
     </publications>
     <dependencies>
         <dependency org="commons-logging" name="commons-logging-api" rev="1.1"/>
