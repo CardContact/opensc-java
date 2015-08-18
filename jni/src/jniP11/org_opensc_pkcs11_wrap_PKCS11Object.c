@@ -476,10 +476,10 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Object_d
   pkcs11_slot_t *slot;
 
   pkcs11_module_t *mod =  pkcs11_module_from_jhandle(env,mh);
-  if (!mod) return 0;
+  if (!mod) return;
 
   slot = pkcs11_slot_from_jhandle(env,shandle);
-  if (!slot) return 0;
+  if (!slot) return;
 
   rv = mod->method->C_DestroyObject(hsession,ohandle);
   
