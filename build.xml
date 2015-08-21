@@ -4,6 +4,10 @@
 	<property file="../jcesigner.cfg" />
       
 	<property name="build" location="build"/>
+
+	<!-- Default used when build outside CI -->
+	<property name="build_id" value="local"/>
+
 	<property name="publishresolver" value="local"/>
 
 	<path id="project.class.path">
@@ -54,7 +58,7 @@
 
 
 	<target name="ivypublish" depends="sign_jar">
-		<ivy:publish organisation="org.openscdp" module="opensc-java" resolver="${publishresolver}" pubrevision="0.4" update="true" overwrite="true">
+		<ivy:publish resolver="${publishresolver}" pubrevision="0.4.${build_id}">
 			<artifacts pattern="build/lib/[artifact].[ext]" />
 		</ivy:publish>
 	</target>
