@@ -2,7 +2,7 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="pkcs11" basedir="." default="dist">
 
 	<property file="../jcesigner.cfg" />
-      
+
 	<property name="build" location="build"/>
 
 	<!-- Default used when build outside CI -->
@@ -58,12 +58,12 @@
 
 
 	<target name="ivypublish" depends="sign_jar">
-		<ivy:publish resolver="${publishresolver}" pubrevision="0.4.${build_id}">
+		<ivy:publish resolver="${publishresolver}" pubrevision="0.4.${build_id}" forcedeliver="true">
 			<artifacts pattern="build/lib/[artifact].[ext]" />
 		</ivy:publish>
 	</target>
-    
-    
+
+
 	<target name="clean">
 		<delete dir="${build}"/>
 		<delete dir="${basedir}/java/lib"/>
