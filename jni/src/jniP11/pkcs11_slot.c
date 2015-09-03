@@ -54,15 +54,15 @@ pkcs11_slot_t *new_pkcs11_slot(JNIEnv *env,  pkcs11_module_t *mod, CK_SLOT_ID id
     }
 
 #ifdef DEBUG_PKCS11_SLOT
-  fprintf(stderr,"Loaded slot: %d.\n",(int)id);
-  fprintf(stderr,"handle= %p.\n",slot);
-  fprintf(stderr,"description= %.64s.\n",slot->ck_slot_info.slotDescription);
-  fprintf(stderr,"manufacturer= %.32s.\n",slot->ck_slot_info.manufacturerID);
-  fprintf(stderr,"flags= %x.\n",(unsigned)slot->ck_slot_info.flags);
-  fprintf(stderr,"hardwareVersion= %d.%d.\n",
+  LOGE("Loaded slot: %d.\n",(int)id);
+  LOGE("handle= %p.\n",slot);
+  LOGE("description= %.64s.\n",slot->ck_slot_info.slotDescription);
+  LOGE("manufacturer= %.32s.\n",slot->ck_slot_info.manufacturerID);
+  LOGE("flags= %x.\n",(unsigned)slot->ck_slot_info.flags);
+  LOGE("hardwareVersion= %d.%d.\n",
           (int)slot->ck_slot_info.hardwareVersion.major,
           (int)slot->ck_slot_info.hardwareVersion.minor );
-  fprintf(stderr,"firmwareVersion= %d.%d.\n",
+  LOGE("firmwareVersion= %d.%d.\n",
           (int)slot->ck_slot_info.firmwareVersion.major,
           (int)slot->ck_slot_info.firmwareVersion.minor );
 #endif
@@ -78,16 +78,16 @@ pkcs11_slot_t *new_pkcs11_slot(JNIEnv *env,  pkcs11_module_t *mod, CK_SLOT_ID id
         }
 
 #ifdef DEBUG_PKCS11_SLOT
-      fprintf(stderr,"token.label= %.32s.\n",slot->ck_token_info.label);
-      fprintf(stderr,"token.manufacturer= %.32s.\n",slot->ck_token_info.manufacturerID);
-      fprintf(stderr,"token.model= %.16s.\n",slot->ck_token_info.model);
-      fprintf(stderr,"token.serialNumber= %.16s.\n",slot->ck_token_info.serialNumber);
-      fprintf(stderr,"token.flags= %x.\n",(unsigned)slot->ck_token_info.flags);
-      fprintf(stderr,"token.ulMaxSessionCount= %u.\n",
+      LOGE("token.label= %.32s.\n",slot->ck_token_info.label);
+      LOGE("token.manufacturer= %.32s.\n",slot->ck_token_info.manufacturerID);
+      LOGE("token.model= %.16s.\n",slot->ck_token_info.model);
+      LOGE("token.serialNumber= %.16s.\n",slot->ck_token_info.serialNumber);
+      LOGE("token.flags= %x.\n",(unsigned)slot->ck_token_info.flags);
+      LOGE("token.ulMaxSessionCount= %u.\n",
               (unsigned)slot->ck_token_info.ulMaxSessionCount);
-      fprintf(stderr,"token.ulMaxPinLen= %u.\n",
+      LOGE("token.ulMaxPinLen= %u.\n",
               (unsigned)slot->ck_token_info.ulMaxPinLen);
-      fprintf(stderr,"token.ulMinPinLen= %u.\n",
+      LOGE("token.ulMinPinLen= %u.\n",
               (unsigned)slot->ck_token_info.ulMinPinLen);
 #endif
     }
@@ -121,8 +121,8 @@ pkcs11_slot_t *pkcs11_slot_from_jhandle(JNIEnv *env, jlong handle)
 void destroy_pkcs11_slot(JNIEnv *env, pkcs11_module_t *mod, pkcs11_slot_t *slot)
 { 
 #ifdef DEBUG_PKCS11_SLOT
-  fprintf(stderr,"Unloading slot: %d.\n",(int)slot->id);
-  fprintf(stderr,"handle= %p.\n",slot);
+  LOGE("Unloading slot: %d.\n",(int)slot->id);
+  LOGE("handle= %p.\n",slot);
 #endif
 
   memset(slot, 0, sizeof(pkcs11_slot_t));

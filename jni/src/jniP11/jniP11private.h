@@ -26,6 +26,16 @@
 #include <jnix.h>
 #include <opensc/pkcs11.h>
 
+#ifdef ANDROID 
+#include <android/log.h>
+#define  LOG_TAG    "OpenSC_JNI_BINDINGS"
+#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#else
+#define LOGD(...) fprintf( stderr, __VA_ARGS__)
+#define LOGE(...) fprintf( stderr, __VA_ARGS__)
+#endif /* ANDROID */
+
 typedef struct pkcs11_module_st pkcs11_module_t;
 
 #define PKCS11_MODULE_MAGIC 0xd0bed0be
