@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="pkcs11" basedir="." default="dist">
+
+	<property file="../jcesigner.cfg" />
+
+	<property name="build" location="build"/>
+
+	<!-- Default used when build outside CI -->
+	<property name="build_id" value="local"/>
+
+	<property name="publishresolver" value="local"/>
+
+	<path id="project.class.path">
+		<fileset dir="java/lib">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${build}"/>
+		<property name="ivy.settings.file" value="../ivysettings.xml" />
+		<property name="ivy.settings.url" value="http://jenkins.mi.cardcontact.de/ivysettings.xml" />
+	</target>
+
+
+	<target name="compile">
+		<mkdir dir="${build}/bin"/>
+		<javac encoding="8859_1" srcdir="${basedir}/java/src" destdir="${build}/bin">
+			<classpath refid="project.class.path"/>
+			<exclude name="**/.git"/>
+		</javac>
+	</target>
+
+
+	<target name="dist" depends="compile" >
+		<mkdir dir="${build}/lib"/>
+		<jar jarfile="${build}/lib/opensc-java.jar" basedir="${build}/bin"/>
+		<copy todir="${build}/lib">
+            <fileset dir="${basedir}/jni/prebuild">
+                <include name="*"/>
+            </fileset>
+		</copy>
+		<delete dir="${build}/bin"/>
+	</target>
+
+
+	<target name="sign_jar" depends="dist">
+		<signjar jar="${build}/lib/opensc-java.jar" keystore="${jarsigner.keystore}" alias="${jarsigner.alias}" storepass="${jarsigner.password}"/>
+	</target>
+
+
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${basedir}/java/lib"/>
+	</target>
+</project>
