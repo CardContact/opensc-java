@@ -53,6 +53,5 @@
 
 	<target name="clean">
 		<delete dir="${build}"/>
-		<delete dir="${basedir}/java/lib"/>
 	</target>
 </project>
