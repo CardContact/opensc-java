@@ -1,8 +1,8 @@
 /***********************************************************
  * $Id: PKCS11KeyStoreSpi.java 44 2007-01-28 20:29:17Z wolfgang.glas $
- * 
+ *
  * PKCS11 provider of the OpenSC project http://www.opensc-project.org
- * 
+ *
  * Copyright (C) 2006 ev-i Informationstechnologie GmbH
  *
  * Created: Jul 16, 2006
@@ -20,7 +20,7 @@
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
- * 
+ *
  ***********************************************************/
 
 package org.opensc.pkcs11.spi;
@@ -75,40 +75,40 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	static private final Log log = LogFactory.getLog(PKCS11KeyStoreSpi.class);
 
 	static private final int MAX_SIMILAR_CERTIFICATES = 32;
-	
+
 	private class PKCS11KSEntry implements Entry
 	{
 		public Date creationDate;
 		public PKCS11Certificate certificate;
 		private Certificate decodedCertificate;
 		public PKCS11PrivateKey privateKey;
-		
+
 		PKCS11KSEntry(PKCS11PrivateKey privateKey)
 		{
 			this.creationDate = new Date();
 			this.privateKey = privateKey;
 		}
-		
+
 		PKCS11KSEntry(PKCS11Certificate certificate)
 		{
 			this.creationDate = new Date();
 			this.certificate = certificate;
 		}
-		
+
 		public Certificate getDecodedCertificate() throws PKCS11Exception, CertificateException
 		{
 			if (this.decodedCertificate == null && this.certificate != null)
 				this.decodedCertificate = this.certificate.getCertificate();
-			
+
 			return this.decodedCertificate;
 		}
 	}
-	
+
 	private final PKCS11Provider provider;
 	private PKCS11SessionStore sessionStore;
     private boolean needToCloseSessionStore;
 	private Map<String,PKCS11KSEntry> entries;
-	
+
 	/**
 	 * Contruct a PKCS11 KeyStore.
 	 */
@@ -119,11 +119,11 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
         this.sessionStore = null;
         this.entries = null;
 		this.needToCloseSessionStore = false;
-        
+
 		if (algorithm != "PKCS11")
 			throw new ProviderException("Algorithm for PKCS11 KeyStore can only be \"PKCS11\".");
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.security.KeyStoreSpi#engineGetKey(java.lang.String, char[])
 	 */
@@ -135,39 +135,39 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 		if (entry == null) return null;
 		return entry.privateKey;
 	}
-	
+
 	/**
 	 * Returns all certificates for the given X500Principal.
-	 * 
+	 *
 	 * @param subject The subject to search for.
 	 * @return All certificates, which match this subject.
 	 */
 	private Map<String,PKCS11KSEntry> getAllCertificatesForSubject(X500Principal subject)
 	{
 		Map<String,PKCS11KSEntry> ret = new HashMap<String,PKCS11KSEntry>();
-		
+
 		String subj = subject.toString();
-		
+
 		PKCS11KSEntry entry = this.entries.get(subj);
-		
+
 		if (entry != null)
 		{
 			ret.put(subj,entry);
-			
+
 			int i = 1;
-			
+
 			do
 			{
 				++i;
 				String name = String.format("%s_%02X",subj,i);
-				
+
 				entry = this.entries.get(name);
 				if (entry != null) ret.put(name,entry);
 			}
 			while (entry != null && i < MAX_SIMILAR_CERTIFICATES);
 		}
-		
-		
+
+
 		return ret;
 	}
 
@@ -175,11 +175,11 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	{
 		if (!cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()))
 			return false;
-		
+
 		cert.verify(cert.getPublicKey());
 		return true;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.security.KeyStoreSpi#engineGetCertificateChain(java.lang.String)
 	 */
@@ -187,21 +187,21 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	public Certificate[] engineGetCertificateChain(String name)
 	{
 		Certificate endEntity = engineGetCertificate(name);
-		
+
 		if (endEntity == null) return null;
-		
+
 		if (!(endEntity instanceof X509Certificate))
 		{
 			log.error("engineGetCertificateChain: Only X.509 certificates are supported.");
 			return null;
 		}
-		
+
 		List<Certificate> ret = new ArrayList<Certificate>();
-		
+
 		ret.add(endEntity);
-		
+
 		X509Certificate x509Certificate = (X509Certificate)endEntity;
-		
+
 		try
 		{
 			// OK ,this is acrude form of certificate chain evaluation.
@@ -214,18 +214,18 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 			{
 				Map<String,PKCS11KSEntry> centries =
 					getAllCertificatesForSubject(x509Certificate.getIssuerX500Principal());
-				
+
 				X509Certificate x509NextCert = null;
-				
+
 				for (PKCS11KSEntry entry : centries.values())
 				{
 					Certificate next = entry.getDecodedCertificate();
-									
+
 					X509Certificate x509Next = (X509Certificate)next;
-				
+
 					if (!x509Next.getSubjectX500Principal().equals(x509Certificate.getIssuerX500Principal()))
 						continue;
-						
+
 					try {
 						x509Certificate.verify(x509Next.getPublicKey());
 						x509NextCert = x509Next;
@@ -235,18 +235,18 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 						log.warn("Exception during evaluation of certificate chain:",e);
 					}
 				}
-				
+
 				if (x509NextCert == null)
 				{
-					throw new CertificateException("Cannot find the issuing CA for certificate ["+x509Certificate+"].");
+					break;
 				}
-				
+
 				x509Certificate = x509NextCert;
 				ret.add(x509Certificate);
 			}
-			
+
 			return ret.toArray(new Certificate[0]);
-			
+
 		} catch (Exception e)
 		{
 			log.error("Exception caught during analysis of the certificate chain:",e);
@@ -318,24 +318,24 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	        PKCS11Certificate cert =
                 PKCS11Certificate.storeCertificate(this.sessionStore.getSession(),
                                                    certificate, name, true);
-            
+
             PKCS11KSEntry entry = new PKCS11KSEntry(cert);
 
             String keyName = "ID_" + cert.getId();
 
             PKCS11KSEntry pk_entry = this.entries.get(keyName);
-                
+
             if (pk_entry != null)
             {
                 entry.privateKey = pk_entry.privateKey;
                 this.entries.remove(keyName);
             }
-            
+
             if (name == null)
                 this.entries.put(cert.getSubject().toString(),entry);
             else
                 this.entries.put(name,entry);
-           
+
         } catch (CertificateEncodingException e)
         {
             throw new KeyStoreException("Error encoding certificate",e);
@@ -354,7 +354,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 		throw new KeyStoreException("deleteEntry is unimplemented.");
 	}
 
-	
+
 	/* (non-Javadoc)
 	 * @see java.security.KeyStoreSpi#engineAliases()
 	 */
@@ -366,7 +366,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 		Set<String> keys = this.entries.keySet();
 		Vector<String> sv = new Vector<String>(keys.size());
 		sv.addAll(keys);
-		
+
 		return sv.elements();
 	}
 
@@ -396,7 +396,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	{
 		PKCS11KSEntry entry = this.entries.get(name);
 		if (entry == null) return false;
-	
+
 		return entry.privateKey != null;
 	}
 
@@ -408,7 +408,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	{
 		PKCS11KSEntry entry = this.entries.get(name);
 		if (entry == null) return false;
-	
+
 		return entry.certificate != null;
 	}
 
@@ -422,23 +422,23 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 		{
 			log.error("engineGetCertificateAlias: Only X.509 certificates are supported.");
 		}
-		
+
 		X509Certificate x509Certificate = (X509Certificate)certificate;
-		
+
 		X500Principal subject = x509Certificate.getSubjectX500Principal();
-		
+
 		Map<String,PKCS11KSEntry> centries = getAllCertificatesForSubject(subject);
-		
+
 		for (String name : centries.keySet())
 		{
 			try
 			{
 				PKCS11KSEntry entry = centries.get(name);
-				
+
 				if (entry.certificate != null &&
 					entry.getDecodedCertificate().equals(certificate))
 					return name;
-				
+
 			} catch (PKCS11Exception e)
 			{
 				log.error("PKCS11 Error decoding Certificate for entry "+name+":",e);
@@ -447,7 +447,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 				log.error("Certificate Error decoding Certificate for entry "+name+":",e);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -460,7 +460,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	{
 		throw new NoSuchAlgorithmException("PKCS11 key store does not support a store operation.");
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.security.KeyStoreSpi#engineLoad(java.io.InputStream, char[])
 	 */
@@ -470,11 +470,11 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	{
 		if (file != null)
 			throw new IOException ("PKCS11 Key Store requires a null InputStream a the first argument.");
-	
+
 		PKCS11LoadStoreParameter param = new PKCS11LoadStoreParameter();
-		
+
 		param.setProtectionParameter(new PasswordProtection(pin));
-		
+
 		engineLoad(param);
 	}
 
@@ -490,7 +490,7 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	        if (this.needToCloseSessionStore)
 	            this.sessionStore.close();
 	    }
-            
+
 	    if (param instanceof PKCS11SessionStore)
 	    {
 	        this.sessionStore = (PKCS11SessionStore)param;
@@ -502,67 +502,67 @@ public class PKCS11KeyStoreSpi extends KeyStoreSpi
 	        this.needToCloseSessionStore = true;
 	        this.sessionStore.open(this.provider, param);
 	    }
-	    
+
 	    // OK, the session is up and running, now get the certificates
 	    // and keys.
 	    this.entries = new HashMap<String,PKCS11KSEntry>();
-			
+
 	    List<PKCS11PrivateKey> privKeys =
 	        PKCS11PrivateKey.getPrivateKeys(this.sessionStore.getSession());
-			
+
 	    Map<PKCS11Id,PKCS11KSEntry> privKeysById =
 	        new HashMap<PKCS11Id,PKCS11KSEntry>();
-			
+
 	    for (PKCS11PrivateKey privKey : privKeys)
 	    {
 	        privKeysById.put(privKey.getId(),new PKCS11KSEntry(privKey));
 	    }
-			
+
 	    List<PKCS11Certificate> certificates =
 	        PKCS11Certificate.getCertificates(this.sessionStore.getSession());
-			
+
 	    for (PKCS11Certificate certificate : certificates)
 	    {
 	        // contruct a unique name for certificate entries.
 	        String subj = certificate.getSubject().toString();
 	        String name = subj;
-	        
+
 	        name = subj;
-				
+
 	        int i = 1;
-					
+
 	        while (this.entries.containsKey(name) && i < MAX_SIMILAR_CERTIFICATES)
 	        {
 	            ++i;
 	            name = String.format("%s_%02X",subj,i);
 	        }
-				
+
 	        if (i >= MAX_SIMILAR_CERTIFICATES) {
 	            throw new CertificateException("More than "+MAX_SIMILAR_CERTIFICATES+
 	                                           " instances of the same certificate subject ["+subj+
 	                                           "]found on the token.");
 	        }
-				
+
 	        PKCS11KSEntry entry = new PKCS11KSEntry(certificate);
 	        PKCS11KSEntry pk_entry = privKeysById.get(certificate.getId());
-				
+
 	        if (pk_entry != null)
 	        {
 	            entry.privateKey = pk_entry.privateKey;
 	            pk_entry.certificate = certificate;
 	        }
-				
+
 	        this.entries.put(name,entry);
 	    }
-	    
+
 	    for (PKCS11Id id : privKeysById.keySet())
 	    {
 	        PKCS11KSEntry entry = privKeysById.get(id);
-				
+
 	        if (entry.certificate != null) continue;
-				
+
 	        String name = "ID_"+id;
-				
+
 	        this.entries.put(name,entry);
 	    }
 	}
