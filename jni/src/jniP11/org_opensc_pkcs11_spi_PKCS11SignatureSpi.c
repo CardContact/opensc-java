@@ -277,7 +277,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11Signature
  */
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_spi_PKCS11SignatureSpi_updateVerifyNative1)
   (JNIEnv *env, jobject jsig, jlong mh, jlong shandle, jlong hsession, jbyte b)
-{ 
+{
   int rv;
   CK_BYTE bb = (CK_BYTE)b;
   pkcs11_slot_t *slot;

@@ -33,7 +33,7 @@
 
 	<target name="compile" depends="resolve">
 		<mkdir dir="${build}/bin"/>
-		<javac encoding="8859_1" srcdir="${basedir}/java/src" destdir="${build}/bin">
+		<javac encoding="8859_1" srcdir="${basedir}/java/src" destdir="${build}/bin" source="1.7" target="1.7">
 			<classpath refid="project.class.path"/>
 			<exclude name="**/.git"/>
 		</javac>

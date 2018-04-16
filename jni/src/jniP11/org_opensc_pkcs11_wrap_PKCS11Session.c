@@ -255,7 +255,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
   if (!slot) return;
 
   memset(&mechanism, 0, sizeof(mechanism));
-  mechanism.mechanism = mech;
+  mechanism.mechanism = (CK_ULONG)mech & 0xFFFFFFFF;
 
   if (param) {
       mechanism.ulParameterLen = (*env)->GetArrayLength(env, param);
@@ -505,7 +505,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
   if (!slot) return;
 
   memset(&mechanism, 0, sizeof(mechanism));
-  mechanism.mechanism = alg;
+  mechanism.mechanism = (CK_ULONG)alg & 0xFFFFFFFF;
 
   if (param) {
       mechanism.ulParameterLen = (*env)->GetArrayLength(env, param);
@@ -587,7 +587,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
  */
 JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_verifyUpdateByteNative)
   (JNIEnv *env, jclass cls, jlong mh, jlong shandle, jlong hsession, jbyte b)
-{ 
+{
   int rv;
   CK_BYTE bb = (CK_BYTE)b;
   pkcs11_slot_t *slot;
@@ -749,7 +749,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
   if (!slot) return;
 
   memset(&mechanism, 0, sizeof(mechanism));
-  mechanism.mechanism = alg;
+  mechanism.mechanism = (CK_ULONG)alg & 0xFFFFFFFF;
 
   if (param) {
       mechanism.ulParameterLen = (*env)->GetArrayLength(env, param);
@@ -790,7 +790,7 @@ JNIEXPORT void JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
   if (!slot) return;
 
   memset(&mechanism, 0, sizeof(mechanism));
-  mechanism.mechanism = alg;
+  mechanism.mechanism = (CK_ULONG)alg & 0xFFFFFFFF;
 
   if (param) {
       mechanism.ulParameterLen = (*env)->GetArrayLength(env, param);
@@ -880,7 +880,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Se
   ret = (*env)->NewByteArray(env,ulOutputLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
-  
+
   return ret;
 }
 
@@ -955,7 +955,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Se
   ret = (*env)->NewByteArray(env,ulOutputLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
-  
+
   return ret;
 }
 
@@ -1008,14 +1008,14 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
     }
 
   ulOutputLen = (*env)->GetArrayLength(env,output);
-  
+
   if (output_off < 0 || output_off > ulOutputLen)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
                          "Invalid output offset %d.",(int)output_off);
       return 0;
     }
- 
+
   ulOutputLen -= output_off;
   pOutputPart = alloca(ulOutputLen);
 
@@ -1032,7 +1032,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
     }
 
   (*env)->SetByteArrayRegion(env,output,output_off,ulOutputLen,(jbyte*)pOutputPart);
-  
+
   return ulOutputLen;
 }
 
@@ -1085,14 +1085,14 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
     }
 
   ulOutputLen = (*env)->GetArrayLength(env,output);
-  
+
   if (output_off < 0 || output_off > ulOutputLen)
     {
       jnixThrowException(env,"org/opensc/pkcs11/wrap/PKCS11Exception",
                          "Invalid output offset %d.",(int)output_off);
       return 0;
     }
- 
+
   ulOutputLen -= output_off;
   pOutputPart = alloca(ulOutputLen);
 
@@ -1109,7 +1109,7 @@ JNIEXPORT jint JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session_
     }
 
   (*env)->SetByteArrayRegion(env,output,output_off,ulOutputLen,(jbyte*)pOutputPart);
-  
+
   return ulOutputLen;
 }
 
@@ -1161,14 +1161,14 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Se
   ret = 0;
 
   if (ulOutputLen > 0)
-    { 
+    {
       ret = (*env)->NewByteArray(env,ulOutputLen);
       if (ret)
         {
           (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
         }
     }
-  
+
   return ret;
 }
 
@@ -1219,7 +1219,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Se
   ret = 0;
 
   if (ulOutputLen > 0)
-    { 
+    {
       ret = (*env)->NewByteArray(env,ulOutputLen);
       if (ret)
         {
@@ -1301,7 +1301,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Se
   ret = (*env)->NewByteArray(env,ulOutputLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
-  
+
   return ret;
 }
 
@@ -1376,7 +1376,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Se
   ret = (*env)->NewByteArray(env,ulOutputLen);
   if (ret)
     (*env)->SetByteArrayRegion(env,ret,0,ulOutputLen,(jbyte*)pOutputPart);
-  
+
   return ret;
 }
 
@@ -1402,7 +1402,7 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session
 	pkcs11_slot_t *slot;
 	pkcs11_module_t *mod = pkcs11_module_from_jhandle(env, mh);
 	if (!mod) return 0;
-  
+
 	slot = pkcs11_slot_from_jhandle(env, shandle);
 	if (!slot) return 0;
 
@@ -1475,7 +1475,7 @@ JNIEXPORT jlongArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Se
 	pkcs11_slot_t *slot;
 	pkcs11_module_t *mod = pkcs11_module_from_jhandle(env, mh);
 	if (!mod) return 0;
-  
+
 	slot = pkcs11_slot_from_jhandle(env, shandle);
 	if (!slot) return 0;
 
@@ -1597,7 +1597,7 @@ JNIEXPORT jbyteArray JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Se
 	ret = 0;
 
 	if (ulOutputLen > 0)
-	{ 
+	{
 		ret = (*env)->NewByteArray(env,ulOutputLen);
 		if (ret)
 		{
@@ -1633,7 +1633,7 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session
 	pkcs11_slot_t *slot;
 	pkcs11_module_t *mod = pkcs11_module_from_jhandle(env, mh);
 	if (!mod) return 0;
-  
+
 	slot = pkcs11_slot_from_jhandle(env, shandle);
 	if (!slot) return 0;
 
@@ -1705,7 +1705,7 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session
 	pkcs11_slot_t *slot;
 	pkcs11_module_t *mod = pkcs11_module_from_jhandle(env, mh);
 	if (!mod) return 0;
-  
+
 	slot = pkcs11_slot_from_jhandle(env, shandle);
 	if (!slot) return 0;
 
@@ -1739,7 +1739,7 @@ JNIEXPORT jlong JNICALL JNIX_FUNC_NAME(Java_org_opensc_pkcs11_wrap_PKCS11Session
 	deriveMechanism.mechanism = algo;
 	mechanismFromJavaObject(env, &deriveMechanism, param);
 
-	rv = mod->method->C_DeriveKey(hsession, &deriveMechanism, baseKey, 
+	rv = mod->method->C_DeriveKey(hsession, &deriveMechanism, baseKey,
                                       pKeyTemplate, ulKeyAttributeCount,
                                       &hKey);
 
